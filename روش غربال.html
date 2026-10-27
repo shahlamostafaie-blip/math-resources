@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>آزمایشگاه تعاملی غربال اراتستن</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --prime-color: #10b981;
+      --composite-color: #fca5a5;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      background: var(--card-bg);
+      padding: 1.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      margin: 0 0 0.5rem 0;
+      color: #0f172a;
+      font-size: 1.8rem;
+    }
+
+    p.subtitle {
+      color: var(--muted);
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      background: #f1f5f9;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    input[type="number"] {
+      width: 80px;
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover:not(:disabled) { background: #1d4ed8; }
+
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-secondary:hover:not(:disabled) { background: #cbd5e1; }
+
+    .btn-accent { background: #8b5cf6; color: white; }
+    .btn-accent:hover:not(:disabled) { background: #7c3aed; }
+
+    /* وضعیت زنده */
+    .status-box {
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      color: #0369a1;
+      padding: 0.85rem 1.2rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* جدول اعداد */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 8px;
+      margin-bottom: 1.5rem;
+      direction: ltr; /* چینش اعداد از چپ به راست داخل سطرها برای خوانایی تمیزتر */
+    }
+
+    .cell {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #334155;
+      transition: transform 0.2s ease, background 0.3s ease, border-color 0.3s ease;
+      position: relative;
+      user-select: none;
+    }
+
+    .cell.current-prime {
+      transform: scale(1.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      border-width: 2px;
+    }
+
+    .cell.prime-final {
+      background-color: #d1fae5 !important;
+      border-color: #059669 !important;
+      color: #065f46 !important;
+      box-shadow: 0 2px 5px rgba(16, 185, 129, 0.2);
+    }
+
+    .cell.crossed {
+      text-decoration: line-through;
+      color: #94a3b8;
+      background-color: #f1f5f9;
+      opacity: 0.75;
+    }
+
+    .cell.one {
+      background-color: #e2e8f0;
+      color: #94a3b8;
+      text-decoration: line-through;
+    }
+
+    /* آمار زیرین */
+    .stats-bar {
+      display: flex;
+      justify-content: space-around;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .stat-item span {
+      font-size: 1.1rem;
+      color: var(--primary);
+    }
+
+    @media (max-width: 600px) {
+      .grid-container {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+      }
+      .cell { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>آزمایشگاه الگوریتم غربال اراتستن</h1>
+    <p class="subtitle">روشی هوشمندانه برای کشف تمامی اعداد اول تا یک عدد مشخص</p>
+  </header>
+
+  <div class="control-panel">
+    <div class="input-group">
+      <label for="max-number">غربال تا عدد:</label>
+      <input type="number" id="max-number" value="100" min="10" max="300" step="10">
+      <button id="btn-reset" class="btn-secondary">شروع مجدد</button>
+    </div>
+
+    <div class="btn-group">
+      <button id="btn-step" class="btn-primary">گام بعدی ⏭</button>
+      <button id="btn-auto" class="btn-accent">پخش خودکار ▶</button>
+    </div>
+  </div>
+
+  <div class="status-box" id="status-text">
+    آماده شروع! دکمه «گام بعدی» یا «پخش خودکار» را بزنید.
+  </div>
+
+  <div class="grid-container" id="grid"></div>
+
+  <div class="stats-bar">
+    <div class="stat-item">آخرین عدد بررسی‌شده: <span id="current-p">-</span></div>
+    <div class="stat-item">تعداد اعداد اول پیدا شده: <span id="prime-count">0</span></div>
+    <div class="stat-item">تعداد اعداد خط‌خورده (مرکب + ۱): <span id="composite-count">0</span></div>
+  </div>
+</div>
+
+<script>
+  let N = 100;
+  let cells = [];
+  let isPrime = [];
+  let currentP = 2;
+  let currentMultiple = 4;
+  let state = "START"; // START, CROSSING_ONE, HIGHLIGHT_PRIME, CROSSING_MULTIPLES, FINISHED
+  let timer = null;
+
+  const colors = [
+    { bg: "#fee2e2", border: "#ef4444", text: "#991b1b" }, // مضارب ۲
+    { bg: "#fef3c7", border: "#f59e0b", text: "#92400e" }, // مضارب ۳
+    { bg: "#f3e8ff", border: "#a855f7", text: "#6b21a8" }, // مضارب ۵
+    { bg: "#cffafe", border: "#06b6d4", text: "#155e75" }, // مضارب ۷
+    { bg: "#ffedd5", border: "#f97316", text: "#9a3412" }, // مضارب ۱۱
+  ];
+
+  const gridEl = document.getElementById("grid");
+  const statusEl = document.getElementById("status-text");
+  const maxInput = document.getElementById("max-number");
+  const btnStep = document.getElementById("btn-step");
+  const btnAuto = document.getElementById("btn-auto");
+  const btnReset = document.getElementById("btn-reset");
+  const currentPEl = document.getElementById("current-p");
+  const primeCountEl = document.getElementById("prime-count");
+  const compositeCountEl = document.getElementById("composite-count");
+
+  function initGrid() {
+    stopAuto();
+    N = parseInt(maxInput.value) || 100;
+    gridEl.innerHTML = "";
+    cells = [];
+    isPrime = new Array(N + 1).fill(true);
+    isPrime[0] = false;
+    isPrime[1] = false;
+
+    currentP = 2;
+    currentMultiple = 4;
+    state = "CROSSING_ONE";
+
+    for (let i = 1; i <= N; i++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.textContent = i;
+      cell.id = `cell-${i}`;
+      gridEl.appendChild(cell);
+      cells[i] = cell;
+    }
+
+    updateStats();
+    statusEl.innerHTML = `جدول با اعداد ۱ تا ${N} رسم شد. برای شروع، عدد ۱ باید مشخص شود.`;
+    btnStep.disabled = false;
+    btnAuto.disabled = false;
+    btnAuto.textContent = "پخش خودکار ▶";
+  }
+
+  function nextStep() {
+    const limit = Math.floor(Math.sqrt(N));
+
+    if (state === "CROSSING_ONE") {
+      cells[1].classList.add("one");
+      statusEl.innerHTML = `<strong>گام ۱:</strong> عدد ۱ نه اول است و نه مرکب، بنابراین در ابتدای کار خط می‌خورد.`;
+      state = "FIND_NEXT_PRIME";
+      updateStats();
+      return;
+    }
+
+    if (state === "FIND_NEXT_PRIME") {
+      while (currentP <= limit && !isPrime[currentP]) {
+        currentP++;
+      }
+
+      if (currentP > limit) {
+        finishSieve();
+        return;
+      }
+
+      // هایلایت عدد اول فعلی
+      cells[currentP].classList.add("current-prime");
+      cells[currentP].classList.add("prime-final");
+      currentMultiple = currentP * currentP; // شروع از مربع عدد اول (قاعده بهینه‌سازی غربال)
+
+      statusEl.innerHTML = `اولین عدد خط‌نخورده <strong>${currentP}</strong> است؛ پس <strong>${currentP} اول است</strong>. حالا مضارب آن را خط می‌زنیم.`;
+      state = "CROSSING_MULTIPLES";
+      currentPEl.textContent = currentP;
+      return;
+    }
+
+    if (state === "CROSSING_MULTIPLES") {
+      if (currentMultiple <= N) {
+        if (isPrime[currentMultiple]) {
+          isPrime[currentMultiple] = false;
+          cells[currentMultiple].classList.add("crossed");
+          
+          // رنگ‌آمیزی متمایز بر اساس مضرب
+          const color = colors[(currentP) % colors.length] || { bg: "#f1f5f9", border: "#cbd5e1", text: "#64748b" };
+          cells[currentMultiple].style.backgroundColor = color.bg;
+          cells[currentMultiple].style.borderColor = color.border;
+          cells[currentMultiple].style.color = color.text;
+
+          statusEl.innerHTML = `مضرب ${currentMultiple} (یعنی ${currentP} × ${currentMultiple / currentP}) خط خورد.`;
+        }
+        currentMultiple += currentP;
+        updateStats();
+      } else {
+        // پایان مضارب عدد اول جاری
+        cells[currentP].classList.remove("current-prime");
+        currentP++;
+        state = "FIND_NEXT_PRIME";
+        nextStep(); // مستقیم بررسی گام بعد
+      }
+    }
+  }
+
+  function finishSieve() {
+    state = "FINISHED";
+    const limit = Math.floor(Math.sqrt(N));
+
+    // باقی‌مانده اعدادی که خط نخورده‌اند اول هستند
+    for (let i = 2; i <= N; i++) {
+      if (isPrime[i]) {
+        cells[i].classList.add("prime-final");
+      }
+    }
+
+    statusEl.innerHTML = `
+      🎯 <strong>غربال به پایان رسید!</strong><br>
+      چون به عددی رسیدیم که مجذور آن از ${N} بزرگ‌تر است ($p > \\sqrt{${N}} \\approx ${limit}$)، تمامی اعداد باقی‌مانده بدون نیاز به بررسی مضارب، <strong>قطعاً اول هستند</strong>.
+    `;
+    btnStep.disabled = true;
+    stopAuto();
+    updateStats();
+  }
+
+  function updateStats() {
+    let primes = 0;
+    let composites = 0;
+
+    for (let i = 2; i <= N; i++) {
+      if (state === "FINISHED" && isPrime[i]) {
+        primes++;
+      } else if (cells[i].classList.contains("prime-final")) {
+        primes++;
+      }
+      
+      if (cells[i].classList.contains("crossed")) {
+        composites++;
+      }
+    }
+    if (cells[1] && cells[1].classList.contains("one")) {
+      composites++; // عدد ۱
+    }
+
+    primeCountEl.textContent = primes;
+    compositeCountEl.textContent = composites;
+  }
+
+  function toggleAuto() {
+    if (timer) {
+      stopAuto();
+    } else {
+      btnAuto.textContent = "توقف ⏸";
+      btnStep.disabled = true;
+      timer = setInterval(() => {
+        if (state === "FINISHED") {
+          stopAuto();
+        } else {
+          nextStep();
+        }
+      }, 400); // سرعت گام‌ها: ۴۰۰ میلی‌ثانیه
+    }
+  }
+
+  function stopAuto() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+      btnAuto.textContent = "پخش خودکار ▶";
+      if (state !== "FINISHED") {
+        btnStep.disabled = false;
+      }
+    }
+  }
+
+  // رویدادها
+  btnStep.addEventListener("click", nextStep);
+  btnAuto.addEventListener("click", toggleAuto);
+  btnReset.addEventListener("click", initGrid);
+  maxInput.addEventListener("change", initGrid);
+
+  // راه‌اندازی اولیه
+  initGrid();
+</script>
+</body>
+</html>
